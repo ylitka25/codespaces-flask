@@ -1,10 +1,17 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from datetime import datetime
+import os
+import sys
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='.', static_url_path='')
 
+# Хранилище задач
 tasks = []
 task_id_counter = 1
+
+@app.route('/')
+def index():
+    return send_from_directory('.', 'index.html')
 
 @app.route('/tasks', methods=['GET'])
 def get_tasks():
@@ -14,6 +21,9 @@ def get_tasks():
 def create_task():
     global task_id_counter
     data = request.json
+    
+    if not data or not data.get('title'):
+        return jsonify({'error': 'Title is required'}), 400
     
     task = {
         'id': task_id_counter,
@@ -31,17 +41,21 @@ def create_task():
 
 @app.route('/tasks/<int:task_id>', methods=['PUT'])
 def update_task(task_id):
-    task = next((t for t in tasks if t['id'] == task_id), None)
-    if task:
-        task['completed'] = not task['completed']
-        return jsonify(task)
+    for task in tasks:
+        if task['id'] == task_id:
+            task['completed'] = not task['completed']
+            return jsonify(task)
     return jsonify({'error': 'Task not found'}), 404
 
 @app.route('/tasks/<int:task_id>', methods=['DELETE'])
 def delete_task(task_id):
     global tasks
-    tasks = [t for t in tasks if t['id'] != task_id]
+    tasks = [task for task in tasks if task['id'] != task_id]
     return jsonify({'message': 'Task deleted'}), 200
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    # Явно указываем порт
+    port = int(os.environ.get('PORT', 10000))
+    print(f"Starting server on port {port}", file=sys.stdout)
+    print(f"Open http://0.0.0.0:{port} in your browser", file=sys.stdout)
+    app.run(host='0.0.0.0', port=port, debug=False)
