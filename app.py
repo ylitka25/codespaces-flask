@@ -1,11 +1,9 @@
 from flask import Flask, request, jsonify, send_from_directory
 from datetime import datetime
 import os
-import sys
 
 app = Flask(__name__, static_folder='.', static_url_path='')
 
-# Хранилище задач
 tasks = []
 task_id_counter = 1
 
@@ -54,8 +52,5 @@ def delete_task(task_id):
     return jsonify({'message': 'Task deleted'}), 200
 
 if __name__ == '__main__':
-    # Явно указываем порт
-    port = int(os.environ.get('PORT', 10000))
-    print(f"Starting server on port {port}", file=sys.stdout)
-    print(f"Open http://0.0.0.0:{port} in your browser", file=sys.stdout)
-    app.run(host='0.0.0.0', port=port, debug=False)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=True)
