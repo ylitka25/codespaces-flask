@@ -1,15 +1,16 @@
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify, send_file
 from datetime import datetime
 import os
 
-app = Flask(__name__, static_folder='.', static_url_path='')
+app = Flask(__name__)
 
 tasks = []
 task_id_counter = 1
 
 @app.route('/')
 def index():
-    return send_from_directory('.', 'index.html')
+    # Отправляем index.html из текущей папки
+    return send_file('index.html')
 
 @app.route('/tasks', methods=['GET'])
 def get_tasks():
