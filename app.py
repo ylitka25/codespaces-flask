@@ -1,22 +1,17 @@
 from flask import Flask, request, jsonify
-from flask_cors import CORS
 from datetime import datetime
 
 app = Flask(__name__)
-CORS(app)
 
-# Хранилище задач в памяти (для примера)
 tasks = []
 task_id_counter = 1
 
 @app.route('/tasks', methods=['GET'])
 def get_tasks():
-    """Получить все задачи"""
     return jsonify(tasks)
 
 @app.route('/tasks', methods=['POST'])
 def create_task():
-    """Создать новую задачу"""
     global task_id_counter
     data = request.json
     
@@ -36,7 +31,6 @@ def create_task():
 
 @app.route('/tasks/<int:task_id>', methods=['PUT'])
 def update_task(task_id):
-    """Обновить задачу (переключить выполнение)"""
     task = next((t for t in tasks if t['id'] == task_id), None)
     if task:
         task['completed'] = not task['completed']
@@ -45,7 +39,6 @@ def update_task(task_id):
 
 @app.route('/tasks/<int:task_id>', methods=['DELETE'])
 def delete_task(task_id):
-    """Удалить задачу"""
     global tasks
     tasks = [t for t in tasks if t['id'] != task_id]
     return jsonify({'message': 'Task deleted'}), 200
